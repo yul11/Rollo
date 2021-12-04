@@ -1,0 +1,54 @@
+
+
+sudo pi4j -c /home/pi/Rollo_programmieren/InitBoard.java     -> ein InitBoard.class-file wird erzeugt
+sudo pi4j -c /home/pi/Rollo_programmieren/Rollo.java         -> ein Rollo.class-file wird erzeugt
+sudo pi4j -c /home/pi/Rollo_programmieren/Start_Rollo.java   -> ein Rollo_Start.class-file wird erzeugt
+
+Befehl zum Auslesen der gpio-Pinbelegung:
+gpio readall
+
+
+
+
+//eigenen Service anlegen
+//https://forum-raspberrypi.de/forum/thread/43352-autostart-unter-raspbian/?postID=382555#post382555
+
+//1. 
+sudo nano /etc/systemd/system/rolloSvc.service
+//2. 
+Diesen Inhalt reinschreiben:
+
+		[Unit]
+		Description=Starten des MFBot bei Systemstart
+
+		[Service]
+		Type=simple
+		
+		ExecStart=lxterminal --geometry=100x20 -l --loginshell --working-directory=Rollo_programmieren --command "./run Start_Rollo"		
+		//ExecStart=/home/pi/SFBot/MFBot_Konsole_ARMRasp		
+		//Exec=lxterminal -e cd ~/pi/Rollo_programmieren/ && ./run Start_Rollo
+		
+		User=pi
+		# Restart=always
+
+		[Install]
+		WantedBy=multi-user.target
+
+//3. 
+Konsoleneingabe machen
+sudo chown root:root /etc/systemd/system/rolloSvc.service
+sudo chmod 644 /etc/systemd/system/rolloSvc.service
+sudo systemctl daemon-reload
+sudo systemctl enable rolloSvc.service
+sudo systemctl start rolloSvc.service
+
+systemctl --failed gibt aus, welcher Service degraded wurde
+systemctl status mfbot.service Status eines einzelnen Services ausgeben
+
+sudo chmod g+w Rollo.java //gibt der Gruppe g Rechte, in Rollo.java zu schreiben
+sudo chmod +w /etc/systemd/system/rolloSvc.service
+
+Fehlermeldung:
+ ExecStart=/usr/bin/lxterminal --geometry=100x20 -l --loginshell --........code=exited, status=1/FAILURE
+
+
